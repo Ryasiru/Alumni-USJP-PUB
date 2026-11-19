@@ -1087,6 +1087,53 @@
     </div>
   </div>
 
+  <!-- MODAL: CLOUD / OFFLINE SAVE HELPER -->
+  <div class="modal-backdrop" id="cloud-save-modal" style="display:none;">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <div>
+          <h3>☁️ Member Updated (Cloud Mode)</h3>
+          <p id="cloud-modal-subtitle">GitHub Pages Cloud Mode</p>
+        </div>
+        <button type="button" class="btn-modal-close" id="btn-close-cloud-modal" title="Close modal">✕</button>
+      </div>
+      <div style="padding: 22px; line-height: 1.6; color: #e8ded4;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; background: rgba(255,210,0,0.12); border: 1px solid rgba(255,210,0,0.35); padding: 12px 16px; border-radius: 8px;">
+          <span style="font-size: 26px;">✓</span>
+          <div>
+            <strong style="color: #ffd200; font-size: 15px;" id="cloud-modal-member-title">Member Updated!</strong>
+            <div style="font-size: 12.5px; color: #ddd;">Saved to current browser session and preview.</div>
+          </div>
+        </div>
+
+        <p style="font-size: 13.5px; margin-bottom: 14px; color: #d0c0b0;">
+          Because this website is hosted on <strong>GitHub Pages</strong>, web browsers cannot directly rewrite files on GitHub without a git commit.
+        </p>
+
+        <div style="background: rgba(0,0,0,0.35); padding: 14px; border-radius: 8px; border: 1px solid rgba(255,210,0,0.2); margin-bottom: 20px;">
+          <div style="font-weight: 600; color: #ffd200; margin-bottom: 6px; font-size: 13px;">To publish permanently to your GitHub repository:</div>
+          <ol style="margin: 0; padding-left: 20px; font-size: 12.5px; color: #bbb;">
+            <li style="margin-bottom: 4px;">Click <strong>Download Updated index.html</strong> below.</li>
+            <li style="margin-bottom: 4px;">Replace <code>index.html</code> in your project repository folder.</li>
+            <li>Run: <code>git add index.html && git commit -m "Update alumni" && git push</code></li>
+          </ol>
+        </div>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end;">
+          <button type="button" class="btn-tool" id="btn-copy-member-code" style="padding: 9px 14px;">
+            📋 Copy Member Code
+          </button>
+          <button type="button" class="btn-primary-action" id="btn-download-updated-index" style="padding: 9px 16px; margin: 0; background: linear-gradient(135deg, #ffd200 0%, #b89000 100%); color: #1a0005; font-weight: 700; border: none; border-radius: 6px; cursor: pointer;">
+            <span>📥</span> Download Updated index.html
+          </button>
+          <button type="button" class="btn-tool" id="btn-cloud-modal-done" style="padding: 9px 14px;">
+            ✕ Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- TOAST NOTIFICATION -->
   <div class="toast-banner" id="toast">
     <span>✓</span>
@@ -1486,7 +1533,123 @@
       updateArrayModalContent();
     }
 
-    // Submit form (Update alumni on disk and refresh page to show latest baseMembers)
+    function formatMemberJsLine(m, no) {
+      return '  {' +
+        'name:' + JSON.stringify(String(m.name || '').trim()) + ', ' +
+        'address:' + JSON.stringify(String(m.address || '').trim()) + ', ' +
+        'office:' + JSON.stringify(String(m.office || '').trim()) + ', ' +
+        'tel:' + JSON.stringify(String(m.tel || '').trim()) + ', ' +
+        'residenceNo:' + JSON.stringify(String(m.residenceNo || '').trim()) + ', ' +
+        'email:' + JSON.stringify(String(m.email || '').trim()) + ', ' +
+        'designation:' + JSON.stringify(String(m.designation || '').trim()) + ', ' +
+        'graduation:' + JSON.stringify(String(m.graduation || '').trim()) + ', ' +
+        'amLm:' + JSON.stringify(String(m.amLm || 'LM').trim()) + ', ' +
+        'membershipNo:' + JSON.stringify(String(no).trim()) +
+        '},\n';
+    }
+
+    function applyMemberUpdateLocally(updatedAlumni) {
+      const origNo = String(updatedAlumni.originalMembershipNo || updatedAlumni.membershipNo).trim();
+      const newNo = String(updatedAlumni.membershipNo || origNo).trim();
+
+      const idx = currentMembersList.findIndex(m => String(m.membershipNo).trim() === origNo);
+      if (idx !== -1) {
+        currentMembersList[idx] = { ...currentMembersList[idx], ...updatedAlumni, membershipNo: newNo };
+      } else {
+        currentMembersList.push({ ...updatedAlumni, membershipNo: newNo });
+      }
+
+      selectedMember = { ...updatedAlumni, membershipNo: newNo };
+      origNoInput.value = newNo;
+
+      // Update dropdown option
+      const currentOpt = memberDropdown.querySelector(`option[value="${origNo}"]`);
+      if (currentOpt) {
+        currentOpt.value = newNo;
+        currentOpt.textContent = `#${newNo} - ${updatedAlumni.name} (${updatedAlumni.amLm || 'LM'})`;
+      }
+
+      updateLivePreview();
+      updateArrayModalContent();
+      showToast(`✓ Member #${newNo} (${updatedAlumni.name}) updated in session!`);
+    }
+
+    let pendingCloudMember = null;
+    function showCloudSaveModal(updatedAlumni, modeName) {
+      pendingCloudMember = updatedAlumni;
+      const modal = document.getElementById('cloud-save-modal');
+      const title = document.getElementById('cloud-modal-member-title');
+      const subtitle = document.getElementById('cloud-modal-subtitle');
+      if (title) title.textContent = `Member #${updatedAlumni.membershipNo} (${updatedAlumni.name})`;
+      if (subtitle) subtitle.textContent = modeName || 'GitHub Cloud Mode';
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeCloudSaveModal() {
+      const modal = document.getElementById('cloud-save-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    async function downloadUpdatedIndexHtml(updatedMember) {
+      if (!updatedMember) updatedMember = pendingCloudMember;
+      if (!updatedMember) return;
+
+      try {
+        const btn = document.getElementById('btn-download-updated-index');
+        if (btn) btn.innerHTML = '<span>⏳</span> Preparing Download...';
+        const res = await fetch('index.html?t=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) throw new Error('Could not fetch index.html from server');
+        let html = await res.text();
+
+        const origNo = String(updatedMember.originalMembershipNo || updatedMember.membershipNo).trim();
+        const newNo = String(updatedMember.membershipNo || origNo).trim();
+        const memberLine = formatMemberJsLine(updatedMember, newNo);
+
+        const escapedOrig = origNo.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp('^[ \\t]*\\{[^\\n]*?membershipNo:\\s*["\']' + escapedOrig + '["\'][^\\n]*?\\},?\\r?\\n', 'm');
+
+        if (regex.test(html)) {
+          html = html.replace(regex, memberLine);
+        } else {
+          html = html.replace('];\n    let members = baseMembers.slice();', memberLine + '];\n    let members = baseMembers.slice();');
+        }
+
+        const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'index.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        if (btn) btn.innerHTML = '<span>✓</span> Downloaded index.html';
+        showToast('✓ index.html downloaded! Replace it in your repository folder and push to git.');
+      } catch (err) {
+        showToast('Download error: ' + err.message, true);
+        const btn = document.getElementById('btn-download-updated-index');
+        if (btn) btn.innerHTML = '<span>📥</span> Download Updated index.html';
+      }
+    }
+
+    function copyMemberCode(member) {
+      if (!member) member = pendingCloudMember;
+      if (!member) return;
+      const no = String(member.membershipNo || member.originalMembershipNo || '').trim();
+      const line = formatMemberJsLine(member, no);
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(line).then(() => {
+          showToast('✓ Member code copied to clipboard!');
+        }).catch(() => {
+          showToast('Code: ' + line.trim());
+        });
+      } else {
+        showToast('Code: ' + line.trim());
+      }
+    }
+
+    // Submit form (Update alumni on disk or cloud session)
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -1510,9 +1673,23 @@
         address: addressInput.value.trim()
       };
 
+      const isRemoteHost = (window.location.protocol === 'https:' && !['localhost', '127.0.0.1'].includes(window.location.hostname)) ||
+                           window.location.hostname.includes('github.io') ||
+                           window.location.hostname.includes('github.com');
+
+      if (isRemoteHost) {
+        // GitHub Pages Cloud Mode: Save locally in browser and present Cloud Save modal
+        applyMemberUpdateLocally(updatedAlumni);
+        showCloudSaveModal(updatedAlumni, 'GitHub Cloud Mode');
+        btnSave.disabled = false;
+        btnSave.innerHTML = '<span>💾</span> Save Changes (Cloud Mode)';
+        return;
+      }
+
       btnSave.disabled = true;
       btnSave.innerHTML = '<span>⏳</span> Saving & Refreshing...';
 
+      // Local Desktop Mode: Try daemon on port 4567
       try {
         const resp = await fetch('http://127.0.0.1:4567/update', {
           method: 'POST',
@@ -1531,25 +1708,20 @@
             btnSave.innerHTML = '<span>🔄</span> Refreshing Page...';
             showToast(`✓ Member #${updatedAlumni.membershipNo} permanently saved! Refreshing whole page...`);
 
-            // Unconditionally refresh the whole update UI page
             setTimeout(() => {
               window.location.reload();
             }, 350);
-          } else {
-            showToast('Update failed: ' + (resData.error || 'Unknown error'), true);
-            btnSave.disabled = false;
-            btnSave.innerHTML = '<span>💾</span> Save Changes to Disk';
+            return;
           }
-        } else {
-          showToast('Could not reach auto-updater on port 4567.', true);
-          btnSave.disabled = false;
-          btnSave.innerHTML = '<span>💾</span> Save Changes to Disk';
         }
+        applyMemberUpdateLocally(updatedAlumni);
+        showCloudSaveModal(updatedAlumni, 'Local Auto-Updater Offline');
       } catch (err) {
-        showToast('Auto-updater is offline. Launch start_directory.command or update_alumni.command to start it.', true);
+        applyMemberUpdateLocally(updatedAlumni);
+        showCloudSaveModal(updatedAlumni, 'Local Auto-Updater Offline');
+      } finally {
         btnSave.disabled = false;
         btnSave.innerHTML = '<span>💾</span> Save Changes to Disk';
-      } finally {
         checkDaemonStatus();
       }
     });
@@ -1612,6 +1784,31 @@
         await loadBaseMembersFromIndex();
         btnRefreshModalArray.textContent = '🔄 Re-read index.html';
         showToast('✓ Re-read baseMembers array from index.html');
+      });
+    }
+
+    // Cloud modal event listeners
+    const cloudSaveModal = document.getElementById('cloud-save-modal');
+    const btnCloseCloudModal = document.getElementById('btn-close-cloud-modal');
+    const btnCloudModalDone = document.getElementById('btn-cloud-modal-done');
+    const btnDownloadIndex = document.getElementById('btn-download-updated-index');
+    const btnCopyCode = document.getElementById('btn-copy-member-code');
+
+    if (btnCloseCloudModal) btnCloseCloudModal.addEventListener('click', closeCloudSaveModal);
+    if (btnCloudModalDone) btnCloudModalDone.addEventListener('click', closeCloudSaveModal);
+    if (cloudSaveModal) {
+      cloudSaveModal.addEventListener('click', (e) => {
+        if (e.target === cloudSaveModal) closeCloudSaveModal();
+      });
+    }
+    if (btnDownloadIndex) {
+      btnDownloadIndex.addEventListener('click', () => {
+        downloadUpdatedIndexHtml();
+      });
+    }
+    if (btnCopyCode) {
+      btnCopyCode.addEventListener('click', () => {
+        copyMemberCode();
       });
     }
 

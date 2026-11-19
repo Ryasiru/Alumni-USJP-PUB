@@ -727,6 +727,53 @@
 
   </main>
 
+  <!-- MODAL: CLOUD / OFFLINE SAVE HELPER -->
+  <div class="modal-backdrop" id="cloud-save-modal" style="display:none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 99999; backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 20px;">
+    <div class="modal-content" style="background: #1e1e1e; color: #f1f1f1; border: 2px solid var(--usj-gold); border-radius: 12px; max-width: 600px; width: 100%; box-shadow: 0 20px 50px rgba(0,0,0,0.8); overflow: hidden;">
+      <div style="background: linear-gradient(180deg, #2a000a 0%, #1a0005 100%); padding: 14px 20px; border-bottom: 1.5px solid var(--usj-gold); display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <h3 style="font-family: 'Cinzel', serif; font-size: 15px; font-weight: 700; color: var(--usj-gold-light); margin: 0;">☁️ Member Prepared (Cloud Mode)</h3>
+          <p id="cloud-modal-subtitle" style="font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 2px;">GitHub Pages Cloud Mode</p>
+        </div>
+        <button type="button" id="btn-close-cloud-modal" style="background: rgba(255,255,255,0.1); border: none; color: #fff; font-size: 16px; width: 28px; height: 28px; border-radius: 50%; cursor: pointer;" title="Close modal">✕</button>
+      </div>
+      <div style="padding: 22px; line-height: 1.6; color: #e8ded4;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; background: rgba(255,210,0,0.12); border: 1px solid rgba(255,210,0,0.35); padding: 12px 16px; border-radius: 8px;">
+          <span style="font-size: 26px;">✓</span>
+          <div>
+            <strong style="color: #ffd200; font-size: 15px;" id="cloud-modal-member-title">New Member Prepared!</strong>
+            <div style="font-size: 12.5px; color: #ddd;">Ready to be permanently added to your directory.</div>
+          </div>
+        </div>
+
+        <p style="font-size: 13.5px; margin-bottom: 14px; color: #d0c0b0;">
+          Because this website is hosted on <strong>GitHub Pages</strong>, web browsers cannot directly write to GitHub repository files without a git commit.
+        </p>
+
+        <div style="background: rgba(0,0,0,0.35); padding: 14px; border-radius: 8px; border: 1px solid rgba(255,210,0,0.2); margin-bottom: 20px;">
+          <div style="font-weight: 600; color: #ffd200; margin-bottom: 6px; font-size: 13px;">To publish permanently to your GitHub repository:</div>
+          <ol style="margin: 0; padding-left: 20px; font-size: 12.5px; color: #bbb;">
+            <li style="margin-bottom: 4px;">Click <strong>Download Updated index.html</strong> below (contains this new member).</li>
+            <li style="margin-bottom: 4px;">Replace <code>index.html</code> in your project repository folder.</li>
+            <li>Run: <code>git add index.html && git commit -m "Add new alumni" && git push</code></li>
+          </ol>
+        </div>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end;">
+          <button type="button" class="btn-tool" id="btn-copy-member-code" style="padding: 9px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.25); color: #fff; border-radius: 6px; cursor: pointer;">
+            📋 Copy Member Code
+          </button>
+          <button type="button" id="btn-download-updated-index" style="padding: 9px 16px; margin: 0; background: linear-gradient(135deg, #ffd200 0%, #b89000 100%); color: #1a0005; font-weight: 700; border: none; border-radius: 6px; cursor: pointer;">
+            <span>📥</span> Download Updated index.html
+          </button>
+          <button type="button" id="btn-cloud-modal-done" style="padding: 9px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.25); color: #fff; border-radius: 6px; cursor: pointer;">
+            ✕ Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification -->
   <div class="toast-banner" id="toast">
     <span>✓</span>
@@ -863,6 +910,108 @@
       return false;
     }
 
+    function formatMemberJsLine(m, no) {
+      return '  {' +
+        'name:' + JSON.stringify(String(m.name || '').trim()) + ', ' +
+        'address:' + JSON.stringify(String(m.address || '').trim()) + ', ' +
+        'office:' + JSON.stringify(String(m.office || '').trim()) + ', ' +
+        'tel:' + JSON.stringify(String(m.tel || '').trim()) + ', ' +
+        'residenceNo:' + JSON.stringify(String(m.residenceNo || '').trim()) + ', ' +
+        'email:' + JSON.stringify(String(m.email || '').trim()) + ', ' +
+        'designation:' + JSON.stringify(String(m.designation || '').trim()) + ', ' +
+        'graduation:' + JSON.stringify(String(m.graduation || '').trim()) + ', ' +
+        'amLm:' + JSON.stringify(String(m.amLm || 'LM').trim()) + ', ' +
+        'membershipNo:' + JSON.stringify(String(no).trim()) +
+        '},\n';
+    }
+
+    let pendingCloudNewMember = null;
+    function showCloudSaveModal(newAlumni, modeName) {
+      pendingCloudNewMember = newAlumni;
+      const modal = document.getElementById('cloud-save-modal');
+      const title = document.getElementById('cloud-modal-member-title');
+      const subtitle = document.getElementById('cloud-modal-subtitle');
+      if (title) title.textContent = `New Member #${newAlumni.membershipNo} (${newAlumni.name})`;
+      if (subtitle) subtitle.textContent = modeName || 'GitHub Cloud Mode';
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeCloudSaveModal() {
+      const modal = document.getElementById('cloud-save-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    async function downloadIndexHtmlWithNewMember(newAlumni) {
+      if (!newAlumni) newAlumni = pendingCloudNewMember;
+      if (!newAlumni) return;
+
+      try {
+        const btn = document.getElementById('btn-download-updated-index');
+        if (btn) btn.innerHTML = '<span>⏳</span> Generating HTML...';
+
+        const res = await fetch('index.html?t=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) throw new Error('Could not fetch index.html from server');
+        let html = await res.text();
+
+        const memberLine = formatMemberJsLine(newAlumni, newAlumni.membershipNo);
+        const marker = '];\n    let members = baseMembers.slice();';
+        if (html.includes(marker)) {
+          html = html.replace(marker, memberLine + marker);
+        } else {
+          html = html.replace(/\];\s*let members = baseMembers\.slice\(\);/, memberLine + '];\n    let members = baseMembers.slice();');
+        }
+
+        const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'index.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        if (btn) btn.innerHTML = '<span>✓</span> Downloaded index.html';
+        showToast('✓ Updated index.html downloaded with new member! Push to git to publish.');
+      } catch (err) {
+        showToast('Download error: ' + err.message, true);
+        const btn = document.getElementById('btn-download-updated-index');
+        if (btn) btn.innerHTML = '<span>📥</span> Download Updated index.html';
+      }
+    }
+
+    function copyMemberCode(member) {
+      if (!member) member = pendingCloudNewMember;
+      if (!member) return;
+      const line = formatMemberJsLine(member, member.membershipNo);
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(line).then(() => {
+          showToast('✓ Member code copied to clipboard!');
+        }).catch(() => {
+          showToast('Code: ' + line.trim());
+        });
+      } else {
+        showToast('Code: ' + line.trim());
+      }
+    }
+
+    // Modal buttons event listeners
+    const btnCloseCloudModal = document.getElementById('btn-close-cloud-modal');
+    const btnCloudModalDone = document.getElementById('btn-cloud-modal-done');
+    const btnDownloadIndex = document.getElementById('btn-download-updated-index');
+    const btnCopyCode = document.getElementById('btn-copy-member-code');
+    const cloudModalEl = document.getElementById('cloud-save-modal');
+
+    if (btnCloseCloudModal) btnCloseCloudModal.addEventListener('click', closeCloudSaveModal);
+    if (btnCloudModalDone) btnCloudModalDone.addEventListener('click', closeCloudSaveModal);
+    if (cloudModalEl) {
+      cloudModalEl.addEventListener('click', (e) => {
+        if (e.target === cloudModalEl) closeCloudSaveModal();
+      });
+    }
+    if (btnDownloadIndex) btnDownloadIndex.addEventListener('click', () => downloadIndexHtmlWithNewMember());
+    if (btnCopyCode) btnCopyCode.addEventListener('click', () => copyMemberCode());
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -879,6 +1028,19 @@
         address: addressInput.value.trim()
       };
 
+      const isRemoteHost = (window.location.protocol === 'https:' && !['localhost', '127.0.0.1'].includes(window.location.hostname)) ||
+                           window.location.hostname.includes('github.io') ||
+                           window.location.hostname.includes('github.com');
+
+      if (isRemoteHost) {
+        showToast('✓ ' + newAlumni.name + ' (#' + newAlumni.membershipNo + ') prepared in Cloud Mode!');
+        showCloudSaveModal(newAlumni, 'GitHub Cloud Mode');
+        form.reset();
+        numInput.value = calculateNextMembershipNo();
+        updateLivePreview();
+        return;
+      }
+
       try {
         const resp = await fetch('http://127.0.0.1:4567/add', {
           method: 'POST',
@@ -888,15 +1050,15 @@
         if (resp.ok) {
           const resData = await resp.json();
           if (resData && resData.success) {
-            showToast('✓ ' + newAlumni.name + ' (#' + newAlumni.membershipNo + ') added to official directory!');
+            showToast('✓ ' + newAlumni.name + ' (#' + newAlumni.membershipNo + ') permanently added to disk!');
           } else {
-            showToast('✓ ' + newAlumni.name + ' submitted!');
+            showCloudSaveModal(newAlumni, 'Auto-Updater Offline');
           }
         } else {
-          showToast('✓ ' + newAlumni.name + ' submitted!');
+          showCloudSaveModal(newAlumni, 'Auto-Updater Offline');
         }
       } catch (err) {
-        showToast('✓ ' + newAlumni.name + ' submitted!');
+        showCloudSaveModal(newAlumni, 'Local Auto-Updater Offline');
       }
 
       form.reset();
