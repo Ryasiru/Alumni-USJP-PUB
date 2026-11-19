@@ -3498,7 +3498,51 @@
       }
     }
 
+    function triggerStartCommand() {
+      const isRemoteHost = (window.location.protocol === 'https:' && !['localhost', '127.0.0.1'].includes(window.location.hostname)) ||
+                           window.location.hostname.includes('github.io') ||
+                           window.location.hostname.includes('github.com');
+
+      if (isRemoteHost) {
+        console.log('✓ USJ Alumni Directory running on GitHub (' + window.location.hostname + ') — client-side flipbook active.');
+        return;
+      }
+
+      // 1. Send native execution trigger to background auto-updater daemon
+      try {
+        fetch('http://127.0.0.1:4567/run-start-command', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'start' }),
+          cache: 'no-store'
+        }).then(function(res) {
+          if (res.ok) {
+            console.log('✓ start.command executed by auto-updater daemon');
+          }
+        }).catch(function() {
+          fetch('http://127.0.0.1:4567/start', { method: 'GET', cache: 'no-store' }).catch(function() {});
+        });
+      } catch (e) {}
+
+      // 2. Direct browser trigger for start.command (file:// and direct browser fallback)
+      try {
+        let frame = document.getElementById('start-command-launcher');
+        if (!frame) {
+          frame = document.createElement('iframe');
+          frame.id = 'start-command-launcher';
+          frame.style.display = 'none';
+          frame.style.width = '0';
+          frame.style.height = '0';
+          frame.style.border = 'none';
+          frame.setAttribute('aria-hidden', 'true');
+          document.body.appendChild(frame);
+        }
+        frame.src = 'start.command';
+      } catch (e) {}
+    }
+
     function loginAsGuest() {
+      triggerStartCommand();
       const user = { username: 'Guest', role: 'guest', displayName: 'Guest User' };
       saveSession(user, false);
       showToast('✓ Welcome! Continuing in Guest Access mode.');
@@ -3545,6 +3589,7 @@
         alertBox.style.display = 'flex';
       }
 
+      triggerStartCommand();
       saveSession(user, remember);
       setTimeout(() => {
         openFlipbook(user);
@@ -3614,9 +3659,18 @@
       if (loginForm) {
         loginForm.addEventListener('submit', handleLoginSubmit);
       }
+      const btnLoginSubmit = document.getElementById('btn-login-submit');
+      if (btnLoginSubmit) {
+        btnLoginSubmit.addEventListener('click', () => {
+          triggerStartCommand();
+        });
+      }
       const btnGuest = document.getElementById('btn-guest-login');
       if (btnGuest) {
-        btnGuest.addEventListener('click', loginAsGuest);
+        btnGuest.addEventListener('click', () => {
+          triggerStartCommand();
+          loginAsGuest();
+        });
       }
       const btnTogglePw = document.getElementById('btn-toggle-password');
       if (btnTogglePw) {

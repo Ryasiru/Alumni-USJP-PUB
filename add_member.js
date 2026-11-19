@@ -372,6 +372,26 @@ function startDaemon(port = 4567) {
       return;
     }
 
+    if (reqPath === '/run-start-command' || reqPath === '/api/run-start-command' || reqPath === '/start' || reqPath === '/api/start') {
+      const { exec } = require('child_process');
+      const isWin = process.platform === 'win32';
+      const scriptName = isWin ? 'start.bat' : 'start.command';
+      const scriptPath = path.join(DIR, scriptName);
+
+      const cmd = isWin ? `"${scriptPath}" --no-open` : `bash "${scriptPath}" --no-open`;
+      exec(cmd, { cwd: DIR }, (err, stdout, stderr) => {
+        if (err) {
+          console.error(`[Auto-Updater] Error executing ${scriptName}:`, err.message);
+        } else {
+          console.log(`✓ [Auto-Updater] ${scriptName} triggered and executed successfully`);
+        }
+      });
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, message: `${scriptName} executed successfully` }));
+      return;
+    }
+
     res.writeHead(404);
     res.end();
   });

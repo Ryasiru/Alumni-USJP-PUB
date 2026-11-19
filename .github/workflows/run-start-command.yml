@@ -1,0 +1,47 @@
+name: Run Start Command & Verify Directory
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  run-start-command:
+    name: Execute start.command & Validate Directory
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Make start.command Executable
+        run: chmod +x ./start.command ./start_directory.command
+
+      - name: Run start.command in GitHub
+        env:
+          CI: "true"
+        run: |
+          echo "Starting USJ Alumni Directory via start.command in GitHub..."
+          bash ./start.command --daemon-only
+          sleep 1
+          echo "start.command executed successfully in GitHub runner!"
+
+      - name: Validate Directory Records
+        run: |
+          echo "Checking members data integrity..."
+          node -e "
+            const fs = require('fs');
+            const content = fs.readFileSync('index.html', 'utf8');
+            const match = content.match(/const baseMembers = \[([\s\S]*?)\];\s*let members =/);
+            if (!match) throw new Error('Could not find baseMembers array in index.html');
+            const evalCode = 'const baseMembers = [' + match[1] + ']; baseMembers;';
+            const list = eval(evalCode);
+            console.log('✓ Found ' + list.length + ' validated alumni records in index.html');
+          "

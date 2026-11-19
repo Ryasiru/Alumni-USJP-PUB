@@ -827,6 +827,19 @@
       const badge = document.getElementById('daemon-status-badge');
       const text = document.getElementById('daemon-status-text');
       if (!badge || !text) return false;
+
+      const isRemoteHost = (window.location.protocol === 'https:' && !['localhost', '127.0.0.1'].includes(window.location.hostname)) ||
+                           window.location.hostname.includes('github.io') ||
+                           window.location.hostname.includes('github.com');
+      if (isRemoteHost) {
+        badge.className = 'daemon-status-pill online';
+        badge.style.background = 'rgba(255, 210, 0, 0.15)';
+        badge.style.borderColor = 'rgba(255, 210, 0, 0.5)';
+        badge.style.color = '#ffd200';
+        text.textContent = 'GitHub Cloud Mode';
+        return true;
+      }
+
       try {
         const res = await fetch('http://127.0.0.1:4567/status', { method: 'GET' });
         if (res.ok) {
