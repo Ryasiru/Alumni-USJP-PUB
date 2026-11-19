@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Flip Test</title>
+<style>
+  body {
+    background: #2b2b2b;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+  }
+  .viewport {
+    perspective: 2000px;
+  }
+  .book {
+    position: relative;
+    width: 600px;
+    height: 400px;
+    transform-style: preserve-3d;
+    transition: transform 0.6s ease;
+  }
+  .sheet {
+    position: absolute;
+    top: 0;
+    left: 300px;
+    width: 300px;
+    height: 400px;
+    transform-origin: left center;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  .sheet.flipped {
+    transform: rotateY(-180deg);
+  }
+  .page {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-family: sans-serif;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+  }
+  .front {
+    background: #fdf6e3;
+    transform: rotateY(0deg) translateZ(0.5px);
+  }
+  .back {
+    background: #eee8d5;
+    transform: rotateY(180deg) translateZ(0.5px);
+  }
+</style>
+</head>
+<body>
+<div class="viewport">
+  <div class="book" id="book">
+    <div class="sheet" id="s0" style="z-index: 2;">
+      <div class="page front">Cover Front</div>
+      <div class="page back">Inside Front Cover</div>
+    </div>
+    <div class="sheet" id="s1" style="z-index: 1;">
+      <div class="page front">Page 1</div>
+      <div class="page back">Page 2</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>USJ Alumni Directory - Edit Member Record</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="validate_members.js"></script>
+
+  <style>
+    :root {
+      --usj-crimson: #630018;
+      --usj-crimson-dark: #400010;
+      --usj-crimson-deep: #2a000a;
+      --usj-gold: #c48c02;
+      --usj-gold-light: #ffd700;
+      --usj-gold-glow: #ffe066;
+      --usj-yellow: #f8c008;
+      --bg-dark: #120005;
+      --paper-bg: #fcfbf7;
+      --paper-tint: #f6f3e8;
+      --paper-border: #e2d9c2;
+      --ink-dark: #1f1d1a;
+      --ink-muted: #5e5950;
+      --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.45);
+      --shadow-glow: 0 0 25px rgba(255, 215, 0, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: radial-gradient(circle at 50% 20%, #30000c 0%, var(--bg-dark) 100%);
+      color: var(--ink-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    .app-header {
+      background: linear-gradient(180deg, rgba(40,0,10,0.95) 0%, rgba(20,0,5,0.95) 100%);
+      border-bottom: 2px solid var(--usj-gold);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.7);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-brand img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));
+    }
+
+    .brand-titles h1 {
+      font-family: 'Cinzel', Georgia, serif;
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--usj-gold-light);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    }
+
+    .brand-titles p {
+      font-size: 11px;
+      color: var(--usj-gold);
+      letter-spacing: 0.8px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .daemon-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      transition: all 0.3s ease;
+      letter-spacing: 0.5px;
+    }
+
+    .daemon-status-pill.online {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border-color: rgba(52, 211, 153, 0.4);
+    }
+
+    .daemon-status-pill.offline {
+      background: rgba(245, 158, 11, 0.12);
+      color: #fbbf24;
+      border-color: rgba(251, 191, 36, 0.3);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #94a3b8;
+    }
+
+    .daemon-status-pill.online .status-dot {
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    .daemon-status-pill.offline .status-dot {
+      background: #f59e0b;
+    }
+
+    .header-actions a {
+      text-decoration: none;
+    }
+
+    .btn-nav-book, .btn-nav-add {
+      color: #fff;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      border-radius: 20px;
+      padding: 8px 16px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.25s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .btn-nav-book {
+      background: linear-gradient(135deg, #ffd700 0%, #f1b500 50%, #c48c02 100%);
+      color: var(--usj-crimson-deep);
+      border-color: #fff;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.4), 0 0 15px rgba(255, 210, 0, 0.3);
+    }
+
+    .btn-nav-book:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 18px rgba(0,0,0,0.6), 0 0 22px rgba(255, 245, 0, 0.6);
+    }
+
+    .btn-nav-add:hover {
+      background: rgba(255, 255, 255, 0.18);
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateY(-2px);
+    }
+
+    /* MAIN CONTAINER */
+    .main-container {
+      flex: 1;
+      max-width: 1220px;
+      width: 100%;
+      margin: 26px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1.25fr 0.85fr;
+      gap: 26px;
+      align-items: start;
+    }
+
+    /* CARD CONTAINER */
+    .edit-card {
+      background: var(--paper-bg);
+      border: 2px solid var(--usj-gold);
+      border-radius: 12px;
+      padding: 28px 30px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.6), 0 0 25px rgba(255, 210, 0, 0.15);
+      position: relative;
+    }
+
+    .edit-card::before {
+      content: "";
+      position: absolute;
+      top: 4px; left: 4px; right: 4px; bottom: 4px;
+      border: 1px dashed var(--paper-border);
+      border-radius: 8px;
+      pointer-events: none;
+    }
+
+    .form-title-group {
+      text-align: center;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .inst-badge {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--usj-crimson);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .form-heading {
+      font-family: 'Cinzel', serif;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--usj-crimson-dark);
+      margin: 4px 0 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .form-subtext {
+      font-size: 12px;
+      color: var(--ink-muted);
+    }
+
+    /* MEMBER SELECTOR BAR */
+    .selector-box {
+      background: #fff;
+      border: 2px solid var(--paper-border);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 22px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    }
+
+    .selector-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .selector-title {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--usj-crimson-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .member-count-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--usj-crimson);
+      background: rgba(99, 0, 24, 0.08);
+      border: 1px solid rgba(99, 0, 24, 0.15);
+      border-radius: 12px;
+      padding: 3px 10px;
+      transition: all 0.25s ease;
+    }
+
+    .selector-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .btn-mini-action {
+      background: var(--paper-tint);
+      border: 1px solid var(--paper-border);
+      color: var(--usj-crimson-dark);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+
+    .btn-mini-action:hover {
+      background: var(--usj-crimson);
+      color: #fff;
+      border-color: var(--usj-crimson);
+    }
+
+    /* ARRAY VIEWER MODAL */
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(18, 0, 5, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: #1e1e1e;
+      color: #f1f1f1;
+      border: 2px solid var(--usj-gold);
+      border-radius: 12px;
+      max-width: 900px;
+      width: 100%;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      background: linear-gradient(180deg, #2a000a 0%, #1a0005 100%);
+      padding: 14px 20px;
+      border-bottom: 1.5px solid var(--usj-gold);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-header h3 {
+      font-family: 'Cinzel', serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--usj-gold-light);
+      margin: 0;
+    }
+
+    .modal-header p {
+      font-size: 11px;
+      color: rgba(255,255,255,0.7);
+      margin-top: 2px;
+    }
+
+    .btn-modal-close {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: #fff;
+      font-size: 16px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .btn-modal-close:hover {
+      background: var(--usj-crimson);
+      color: #fff;
+    }
+
+    .modal-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 18px;
+      background: #252526;
+      border-bottom: 1px solid #333;
+    }
+
+    .modal-count-pill {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #ffd700;
+    }
+
+    .btn-tool {
+      background: #333;
+      border: 1px solid #555;
+      color: #eee;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-tool:hover {
+      background: var(--usj-crimson);
+      border-color: var(--usj-gold);
+      color: #fff;
+    }
+
+    .modal-code-viewer {
+      flex: 1;
+      padding: 16px;
+      background: #181818;
+      color: #d4d4d4;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      user-select: text;
+    }
+
+    .selector-row-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .btn-clear-search {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.1);
+      border: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      color: var(--ink-muted);
+      cursor: pointer;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .btn-clear-search:hover {
+      background: var(--usj-crimson);
+      color: #fff;
+    }
+
+    .search-input-wrap {
+      flex: 1;
+      position: relative;
+    }
+
+    .search-input-wrap input {
+      width: 100%;
+      padding: 10px 14px 10px 36px;
+      border: 1.5px solid var(--paper-border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      background: var(--paper-tint);
+      transition: all 0.2s;
+    }
+
+    .search-input-wrap input:focus {
+      outline: none;
+      border-color: var(--usj-crimson);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(99, 0, 24, 0.12);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      color: var(--ink-muted);
+      pointer-events: none;
+    }
+
+    .selector-row-bottom {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .member-select {
+      flex: 1;
+      padding: 10px 12px;
+      border: 1.5px solid var(--usj-gold);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--usj-crimson-deep);
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .btn-cycle {
+      background: var(--paper-tint);
+      border: 1px solid var(--paper-border);
+      color: var(--usj-crimson-dark);
+      padding: 9px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-cycle:hover {
+      background: var(--usj-crimson);
+      color: #fff;
+      border-color: var(--usj-crimson);
+    }
+
+    /* FORM GRID */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full-width {
+      grid-column: span 2;
+    }
+
+    .form-group label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--usj-crimson-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      padding: 10px 12px;
+      border: 1.5px solid var(--paper-border);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 13px;
+      background: #fff;
+      color: var(--ink-dark);
+      transition: all 0.2s ease;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--usj-crimson);
+      box-shadow: 0 0 0 3px rgba(99, 0, 24, 0.12);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 64px;
+    }
+
+    /* RADIO BUTTONS */
+    .radio-group {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      height: 40px;
+    }
+
+    .radio-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .radio-label input[type="radio"] {
+      accent-color: var(--usj-crimson);
+      width: 16px;
+      height: 16px;
+    }
+
+    /* BUTTONS */
+    .btn-submit-row {
+      grid-column: span 2;
+      display: flex;
+      gap: 12px;
+      margin-top: 10px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--paper-border);
+    }
+
+    .btn-save {
+      flex: 2;
+      background: linear-gradient(135deg, var(--usj-crimson) 0%, #870020 100%);
+      color: var(--usj-yellow);
+      font-family: 'Cinzel', serif;
+      font-size: 13.5px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border: 1.5px solid var(--usj-gold);
+      border-radius: 8px;
+      padding: 13px 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      box-shadow: 0 4px 15px rgba(99, 0, 24, 0.4);
+      transition: all 0.25s ease;
+    }
+
+    .btn-save:hover {
+      background: linear-gradient(135deg, #7c001e 0%, #a10026 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(99, 0, 24, 0.6);
+    }
+
+    .btn-revert {
+      flex: 1;
+      background: #fff;
+      color: var(--ink-muted);
+      border: 1.5px solid var(--paper-border);
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-revert:hover {
+      background: var(--paper-tint);
+      color: var(--usj-crimson);
+      border-color: var(--usj-crimson);
+    }
+
+    /* RIGHT PANEL */
+    .side-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      position: sticky;
+      top: 90px;
+    }
+
+    .preview-card-wrap {
+      background: var(--paper-bg);
+      border: 2px solid var(--usj-gold);
+      border-radius: 12px;
+      padding: 22px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .preview-heading {
+      font-family: 'Cinzel', serif;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--usj-crimson-dark);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--paper-border);
+      padding-bottom: 8px;
+    }
+
+    .preview-tag {
+      background: var(--usj-gold);
+      color: var(--usj-crimson-deep);
+      font-size: 9px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 12px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    /* LIVE PREVIEW ROW */
+    .member-row-preview {
+      background: #fff;
+      border: 1.5px solid var(--paper-border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      position: relative;
+    }
+
+    .row-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--paper-border);
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+    }
+
+    .member-name-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .member-num-tag {
+      background: var(--usj-crimson);
+      color: var(--usj-yellow);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-family: 'Cinzel', serif;
+      letter-spacing: 0.5px;
+    }
+
+    .member-name {
+      font-family: 'Cinzel', serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--usj-crimson-dark);
+      letter-spacing: 0.3px;
+    }
+
+    .badges-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .grad-pill {
+      background: var(--paper-tint);
+      color: var(--ink-dark);
+      border: 1px solid var(--paper-border);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+    }
+
+    .lm-pill {
+      background: linear-gradient(135deg, #ffd700 0%, #d49a00 100%);
+      color: #3b000a;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 10px;
+      border: 1px solid #c48c02;
+    }
+
+    .row-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 12px;
+      font-size: 11px;
+    }
+
+    .meta-field {
+      display: flex;
+      gap: 4px;
+      align-items: baseline;
+    }
+
+    .meta-label {
+      font-weight: 700;
+      color: var(--ink-muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      min-width: 44px;
+    }
+
+    .meta-val {
+      color: var(--ink-dark);
+      font-weight: 500;
+      word-break: break-word;
+    }
+
+    .email-val {
+      color: var(--usj-crimson);
+      font-weight: 600;
+    }
+
+    /* DIRECTORY NAV BUTTON */
+    .nav-btn-box {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn-directory-link {
+      background: #fff;
+      border: 1.5px solid var(--paper-border);
+      color: var(--usj-crimson);
+      font-size: 12.5px;
+      font-weight: 700;
+      padding: 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+      transition: all 0.2s;
+    }
+
+    .btn-directory-link:hover {
+      background: var(--paper-tint);
+      border-color: var(--usj-gold);
+      transform: translateY(-2px);
+    }
+
+    /* TOAST */
+    .toast-banner {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      background: #117a38;
+      color: #fff;
+      padding: 14px 22px;
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 9999;
+      transform: translateY(120px);
+      opacity: 0;
+      transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .toast-banner.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    @media (max-width: 900px) {
+      .main-container {
+        grid-template-columns: 1fr;
+      }
+      .side-panel {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="header-brand">
+      <img src="logo.png" onerror="this.style.display='none'" alt="USJ Logo">
+      <div class="brand-titles">
+        <h1>Alumni Directory Editor</h1>
+        <p>University of Sri Jayewardenepura • Life Members</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div id="daemon-status-badge" class="daemon-status-pill offline" title="Live disk auto-updater status">
+        <span class="status-dot"></span> <span id="daemon-status-text">Auto-Updater</span>
+      </div>
+      <a href="index.html">
+        <button class="btn-nav-book">
+          <span>📖</span> Open Directory
+        </button>
+      </a>
+      <a href="add-alumni.html">
+        <button class="btn-nav-add">
+          <span>✚</span> Add Member
+        </button>
+      </a>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="main-container">
+    
+    <!-- EDIT CARD -->
+    <div class="edit-card">
+      <div class="form-title-group">
+        <div class="inst-badge">Faculty of Management Studies & Commerce</div>
+        <h1 class="form-heading">Update Member Details</h1>
+        <p class="form-subtext">Search or pick any alumni below to edit their permanent records on disk.</p>
+      </div>
+
+      <!-- MEMBER SELECTOR BOX -->
+      <div class="selector-box">
+        <div class="selector-header">
+          <span class="selector-title"><span>👥</span> Select Member (baseMembers in index.html)</span>
+          <div class="selector-header-actions">
+            <span id="member-count-badge" class="member-count-badge">Loading baseMembers...</span>
+            <button type="button" id="btn-manual-refresh" class="btn-mini-action" title="Refresh whole update UI page with latest baseMembers">🔄 Refresh Page</button>
+            <button type="button" id="btn-view-array" class="btn-mini-action" title="View latest baseMembers array from index.html">📋 View Array</button>
+          </div>
+        </div>
+        <div class="selector-row-top">
+          <div class="search-input-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-filter" placeholder="Search by name, #no, designation, office, city, graduation..." autocomplete="off">
+            <button type="button" id="btn-clear-search" class="btn-clear-search" title="Clear Search" style="display:none;">✕</button>
+          </div>
+        </div>
+        <div class="selector-row-bottom">
+          <button type="button" id="btn-prev-member" class="btn-cycle" title="Previous Alumni">◀ Prev</button>
+          <select id="member-dropdown" class="member-select" aria-label="Alumni Member Selector">
+            <option value="">-- Choose an Alumni to Edit --</option>
+          </select>
+          <button type="button" id="btn-next-member" class="btn-cycle" title="Next Alumni">Next ▶</button>
+        </div>
+      </div>
+
+      <!-- EDIT FORM -->
+      <form id="edit-form" class="form-grid">
+        <input type="hidden" id="orig-membershipNo">
+
+        <!-- Full Name -->
+        <div class="form-group full-width">
+          <label for="name">Full Name <span style="color:var(--usj-crimson);">*</span></label>
+          <input type="text" id="name" required placeholder="e.g. Prof. / Dr. / Mr. / Ms. A. B. Perera">
+        </div>
+
+        <!-- Membership No -->
+        <div class="form-group">
+          <label for="membershipNo">Membership No <span style="color:var(--usj-crimson);">*</span></label>
+          <input type="text" id="membershipNo" required placeholder="e.g. 1">
+        </div>
+
+        <!-- Membership Type -->
+        <div class="form-group">
+          <label>Membership Type</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="amLm" value="LM" checked> Life Member (LM)
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="amLm" value="AM"> Associate Member (AM)
+            </label>
+          </div>
+        </div>
+
+        <!-- Graduation Year -->
+        <div class="form-group">
+          <label for="graduation">Graduation Year</label>
+          <input type="text" id="graduation" placeholder="e.g. 1985">
+        </div>
+
+        <!-- Designation -->
+        <div class="form-group">
+          <label for="designation">Designation / Role</label>
+          <input type="text" id="designation" placeholder="e.g. Senior Lecturer / Managing Director">
+        </div>
+
+        <!-- Office / Employer -->
+        <div class="form-group full-width">
+          <label for="office">Office / Organization</label>
+          <input type="text" id="office" placeholder="e.g. Dept. of Finance, USJ">
+        </div>
+
+        <!-- Mobile Telephone -->
+        <div class="form-group">
+          <label for="tel">Mobile / Office Telephone</label>
+          <input type="text" id="tel" placeholder="e.g. 077-1234567">
+        </div>
+
+        <!-- Residence Phone -->
+        <div class="form-group">
+          <label for="residenceNo">Residence Phone</label>
+          <input type="text" id="residenceNo" placeholder="e.g. 011-2345678">
+        </div>
+
+        <!-- Email Address -->
+        <div class="form-group full-width">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="e.g. name@domain.com">
+        </div>
+
+        <!-- Permanent Address -->
+        <div class="form-group full-width">
+          <label for="address">Permanent / Contact Address</label>
+          <textarea id="address" placeholder="e.g. No. 12, High Level Road, Nugegoda."></textarea>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="btn-submit-row">
+          <button type="submit" id="btn-save" class="btn-save">
+            <span>💾</span> Save Changes to Disk
+          </button>
+          <button type="button" id="btn-revert" class="btn-revert">
+            ↺ Revert Changes
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- RIGHT PANEL: PREVIEW & NAVIGATION -->
+    <div class="side-panel">
+      <!-- Live Card Preview -->
+      <div class="preview-card-wrap">
+        <div class="preview-heading">
+          <span>Live Flipbook Card Preview</span>
+          <span class="preview-tag">Interactive</span>
+        </div>
+
+        <div class="member-row-preview" id="live-card-preview">
+          <div class="row-top">
+            <div class="member-name-wrap">
+              <span class="member-num-tag" id="preview-num">#0</span>
+              <span class="member-name" id="preview-name">Select an Alumni</span>
+            </div>
+            <div class="badges-group">
+              <span class="grad-pill" id="preview-grad" style="display:none;">Class</span>
+              <span class="lm-pill" id="preview-badge">LM</span>
+            </div>
+          </div>
+          <div class="row-meta-grid">
+            <div class="meta-field">
+              <span class="meta-label">Desig:</span>
+              <span class="meta-val" id="preview-desig">-</span>
+            </div>
+            <div class="meta-field">
+              <span class="meta-label">Office:</span>
+              <span class="meta-val" id="preview-office">-</span>
+            </div>
+            <div class="meta-field">
+              <span class="meta-label">Mobile:</span>
+              <span class="meta-val" id="preview-tel">-</span>
+            </div>
+            <div class="meta-field">
+              <span class="meta-label">Email:</span>
+              <span class="meta-val email-val" id="preview-email">-</span>
+            </div>
+            <div class="meta-field" style="grid-column: span 2;">
+              <span class="meta-label">Address:</span>
+              <span class="meta-val" id="preview-address">-</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUICK LINKS -->
+      <div class="nav-btn-box">
+        <a href="index.html" class="btn-directory-link">
+          <span>📖</span> Return to Directory Flipbook
+        </a>
+        <a href="add-alumni.html" class="btn-directory-link">
+          <span>✚</span> Register New Alumni Member
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL: VIEW LATEST baseMembers ARRAY -->
+  <div class="modal-backdrop" id="array-modal" style="display:none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <h3>Latest baseMembers Array in index.html</h3>
+          <p id="modal-array-subtitle">Extracted directly from index.html</p>
+        </div>
+        <button type="button" class="btn-modal-close" id="btn-close-modal" title="Close viewer">✕</button>
+      </div>
+      <div class="modal-toolbar">
+        <span id="modal-member-count" class="modal-count-pill">0 records</span>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" id="btn-copy-array" class="btn-tool">📋 Copy JSON</button>
+          <button type="button" id="btn-refresh-modal-array" class="btn-tool">🔄 Re-read index.html</button>
+        </div>
+      </div>
+      <pre class="modal-code-viewer" id="modal-code-viewer"><code>Loading baseMembers...</code></pre>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast-banner" id="toast">
+    <span>✓</span>
+    <span id="toast-text">Changes saved!</span>
+  </div>
+
+  <script>
+    // In-memory member list loaded from baseMembers in index.html
+    let currentMembersList = (typeof members !== 'undefined' && Array.isArray(members)) ? members.slice() : [];
+    let selectedMember = null;
+
+    // DOM Elements
+    const searchFilter = document.getElementById('search-filter');
+    const btnClearSearch = document.getElementById('btn-clear-search');
+    const memberDropdown = document.getElementById('member-dropdown');
+    const memberCountBadge = document.getElementById('member-count-badge');
+    const btnPrevMember = document.getElementById('btn-prev-member');
+    const btnNextMember = document.getElementById('btn-next-member');
+
+    // Form inputs
+    const origNoInput = document.getElementById('orig-membershipNo');
+    const nameInput = document.getElementById('name');
+    const numInput = document.getElementById('membershipNo');
+    const gradInput = document.getElementById('graduation');
+    const desigInput = document.getElementById('designation');
+    const officeInput = document.getElementById('office');
+    const telInput = document.getElementById('tel');
+    const residenceInput = document.getElementById('residenceNo');
+    const emailInput = document.getElementById('email');
+    const addressInput = document.getElementById('address');
+    const form = document.getElementById('edit-form');
+    const btnRevert = document.getElementById('btn-revert');
+    const btnSave = document.getElementById('btn-save');
+
+    // Preview elements
+    const prevName = document.getElementById('preview-name');
+    const prevNum = document.getElementById('preview-num');
+    const prevBadge = document.getElementById('preview-badge');
+    const prevGrad = document.getElementById('preview-grad');
+    const prevDesig = document.getElementById('preview-desig');
+    const prevOffice = document.getElementById('preview-office');
+    const prevTel = document.getElementById('preview-tel');
+    const prevEmail = document.getElementById('preview-email');
+    const prevAddress = document.getElementById('preview-address');
+
+    // Toast
+    const toast = document.getElementById('toast');
+    const toastText = document.getElementById('toast-text');
+
+    function showToast(msg, isError) {
+      toastText.textContent = msg;
+      toast.style.background = isError ? '#991b1b' : '#117a38';
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3500);
+    }
+
+    function updateCountBadge(filterCount) {
+      if (!memberCountBadge) return;
+      const total = currentMembersList.length;
+      if (filterCount !== undefined && filterCount !== total) {
+        memberCountBadge.textContent = `Showing ${filterCount} of ${total} baseMembers`;
+        memberCountBadge.style.background = 'rgba(196, 140, 2, 0.18)';
+        memberCountBadge.style.color = 'var(--usj-crimson-dark)';
+      } else {
+        memberCountBadge.textContent = `${total} baseMembers in index.html`;
+        memberCountBadge.style.background = 'rgba(99, 0, 24, 0.08)';
+        memberCountBadge.style.color = 'var(--usj-crimson)';
+      }
+    }
+
+    // Populate dropdown with search filter
+    function populateDropdown(filterText = '') {
+      const q = filterText.toLowerCase().trim();
+      const cleanQ = q.replace(/^#/, '').trim();
+      const currentSelectedNo = memberDropdown.value;
+
+      memberDropdown.innerHTML = '';
+      const defaultOpt = document.createElement('option');
+      defaultOpt.value = '';
+      defaultOpt.textContent = q ? `-- Matching Results (${q}) --` : '-- Choose an Alumni from baseMembers to Edit --';
+      memberDropdown.appendChild(defaultOpt);
+
+      let matchedMembers = [];
+      currentMembersList.forEach((m, idx) => {
+        // Multi-field search across every property
+        const searchable = [
+          m.membershipNo || '',
+          m.name || '',
+          m.designation || '',
+          m.office || '',
+          m.address || '',
+          m.graduation || '',
+          m.email || '',
+          m.tel || '',
+          m.residenceNo || '',
+          m.amLm || ''
+        ].join(' ').toLowerCase();
+
+        if (!cleanQ || searchable.includes(cleanQ)) {
+          matchedMembers.push(m);
+        }
+      });
+
+      // Smart relevance ranking: exact membership # -> prefix membership # -> name prefix
+      if (cleanQ) {
+        matchedMembers.sort((a, b) => {
+          const aExact = String(a.membershipNo).toLowerCase() === cleanQ;
+          const bExact = String(b.membershipNo).toLowerCase() === cleanQ;
+          if (aExact && !bExact) return -1;
+          if (!aExact && bExact) return 1;
+
+          const aStarts = String(a.membershipNo).toLowerCase().startsWith(cleanQ);
+          const bStarts = String(b.membershipNo).toLowerCase().startsWith(cleanQ);
+          if (aStarts && !bStarts) return -1;
+          if (!aStarts && bStarts) return 1;
+
+          const aNameStarts = (a.name || '').toLowerCase().startsWith(cleanQ);
+          const bNameStarts = (b.name || '').toLowerCase().startsWith(cleanQ);
+          if (aNameStarts && !bNameStarts) return -1;
+          if (!aNameStarts && bNameStarts) return 1;
+
+          return 0;
+        });
+      }
+
+      matchedMembers.forEach((m, idx) => {
+        const opt = document.createElement('option');
+        opt.value = m.membershipNo;
+        const badge = (m.amLm || 'LM').toUpperCase();
+        const extra = m.designation || m.office || (m.graduation ? `Class of '${m.graduation}` : '') || m.address;
+        opt.textContent = `#${m.membershipNo} — ${m.name} (${badge})${extra ? ' • ' + extra : ''}`;
+        opt.dataset.index = idx;
+        memberDropdown.appendChild(opt);
+      });
+
+      updateCountBadge(matchedMembers.length);
+
+      if (btnClearSearch) {
+        btnClearSearch.style.display = q ? 'flex' : 'none';
+      }
+
+      // Restore selection if still in filtered list
+      if (currentSelectedNo && matchedMembers.some(m => String(m.membershipNo) === String(currentSelectedNo))) {
+        memberDropdown.value = currentSelectedNo;
+      } else if (q && matchedMembers.length === 1) {
+        // If single match, automatically select and load
+        memberDropdown.value = matchedMembers[0].membershipNo;
+        loadMember(matchedMembers[0].membershipNo);
+      }
+    }
+
+    // Load an alumni into form
+    function loadMember(membershipNo) {
+      if (!membershipNo) return;
+      const m = currentMembersList.find(x => String(x.membershipNo) === String(membershipNo));
+      if (!m) return;
+
+      selectedMember = Object.assign({}, m);
+      origNoInput.value = m.membershipNo || '';
+      nameInput.value = m.name || '';
+      numInput.value = m.membershipNo || '';
+      gradInput.value = m.graduation || '';
+      desigInput.value = m.designation || '';
+      officeInput.value = m.office || '';
+      telInput.value = m.tel || '';
+      residenceInput.value = m.residenceNo || '';
+      emailInput.value = m.email || '';
+      addressInput.value = m.address || '';
+
+      const amLmVal = (String(m.amLm || 'LM').toUpperCase() === 'AM') ? 'AM' : 'LM';
+      const radio = document.querySelector(`input[name="amLm"][value="${amLmVal}"]`);
+      if (radio) radio.checked = true;
+
+      updateLivePreview();
+    }
+
+    function getSafe(val, fallback) {
+      const s = String(val || '').trim();
+      return s ? s : fallback;
+    }
+
+    function updateLivePreview() {
+      const nameVal = getSafe(nameInput.value, 'Alumni Full Name');
+      const numVal = getSafe(numInput.value, '0');
+      const gradVal = getSafe(gradInput.value, '');
+      const desigVal = getSafe(desigInput.value, '-');
+      const officeVal = getSafe(officeInput.value, '-');
+      const telVal = getSafe(telInput.value, '-');
+      const emailVal = getSafe(emailInput.value, '-');
+      const addressVal = getSafe(addressInput.value, '-');
+      const badgeVal = document.querySelector('input[name="amLm"]:checked')?.value || 'LM';
+
+      prevName.textContent = nameVal;
+      prevNum.textContent = '#' + numVal;
+      prevBadge.textContent = badgeVal;
+      prevDesig.textContent = desigVal;
+      prevOffice.textContent = officeVal;
+      prevTel.textContent = telVal;
+      prevEmail.textContent = emailVal;
+      prevAddress.textContent = addressVal;
+
+      if (gradVal) {
+        prevGrad.style.display = 'inline-block';
+        prevGrad.textContent = "Class of '" + gradVal.replace('/', '');
+      } else {
+        prevGrad.style.display = 'none';
+      }
+    }
+
+    // Input listeners for preview
+    [nameInput, numInput, gradInput, desigInput, officeInput, telInput, residenceInput, emailInput, addressInput].forEach(el => {
+      el.addEventListener('input', updateLivePreview);
+    });
+
+    document.querySelectorAll('input[name="amLm"]').forEach(r => {
+      r.addEventListener('change', updateLivePreview);
+    });
+
+    // Dropdown change
+    memberDropdown.addEventListener('change', () => {
+      loadMember(memberDropdown.value);
+    });
+
+    // Search filter input
+    searchFilter.addEventListener('input', () => {
+      populateDropdown(searchFilter.value);
+    });
+
+    // Enter key on search input selects the first search result
+    searchFilter.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (memberDropdown.options.length > 1) {
+          memberDropdown.selectedIndex = 1;
+          loadMember(memberDropdown.value);
+          showToast(`Selected #${memberDropdown.value} — ${nameInput.value}`);
+        }
+      }
+    });
+
+    // Clear search button
+    if (btnClearSearch) {
+      btnClearSearch.addEventListener('click', () => {
+        searchFilter.value = '';
+        populateDropdown('');
+        searchFilter.focus();
+      });
+    }
+
+    // Prev / Next Member buttons
+    btnPrevMember.addEventListener('click', () => {
+      if (memberDropdown.selectedIndex > 1) {
+        memberDropdown.selectedIndex--;
+        loadMember(memberDropdown.value);
+      }
+    });
+
+    btnNextMember.addEventListener('click', () => {
+      if (memberDropdown.selectedIndex < memberDropdown.options.length - 1) {
+        memberDropdown.selectedIndex++;
+        loadMember(memberDropdown.value);
+      }
+    });
+
+    // Revert button
+    btnRevert.addEventListener('click', () => {
+      if (selectedMember) {
+        loadMember(selectedMember.membershipNo);
+        showToast('Form reverted to current saved record.');
+      }
+    });
+
+    // Check daemon status
+    async function checkDaemonStatus() {
+      const badge = document.getElementById('daemon-status-badge');
+      const text = document.getElementById('daemon-status-text');
+      if (!badge || !text) return false;
+      try {
+        const res = await fetch('http://127.0.0.1:4567/status', { method: 'GET' });
+        if (res.ok) {
+          badge.className = 'daemon-status-pill online';
+          text.textContent = 'Auto-Updater Active';
+          return true;
+        }
+      } catch (err) {}
+      badge.className = 'daemon-status-pill offline';
+      text.textContent = 'Auto-Updater Idle';
+      return false;
+    }
+
+    // Update array viewer modal content
+    function updateArrayModalContent() {
+      const viewer = document.getElementById('modal-code-viewer');
+      const countPill = document.getElementById('modal-member-count');
+      const subtitle = document.getElementById('modal-array-subtitle');
+      if (viewer && Array.isArray(currentMembersList)) {
+        if (countPill) countPill.textContent = `${currentMembersList.length} total baseMembers`;
+        if (subtitle) subtitle.textContent = `Extracted directly from index.html (${currentMembersList.length} records)`;
+        viewer.textContent = JSON.stringify(currentMembersList, null, 2);
+      }
+    }
+
+    // Specifically search and load every member in baseMembers array in index.html
+    async function loadBaseMembersFromIndex() {
+      if (memberCountBadge) {
+        memberCountBadge.textContent = 'Loading baseMembers from index.html...';
+      }
+
+      let loadedMembers = null;
+      const cacheBuster = Date.now();
+
+      // 1. Try local daemon endpoint which directly extracts baseMembers from index.html on disk
+      try {
+        const res = await fetch(`http://127.0.0.1:4567/baseMembers?t=${cacheBuster}`, { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && Array.isArray(data.baseMembers) && data.baseMembers.length > 0) {
+            loadedMembers = data.baseMembers;
+            console.log(`✓ Loaded ${loadedMembers.length} members from daemon GET /baseMembers (index.html)`);
+          }
+        }
+      } catch (e) {
+        // Daemon may not be running yet
+      }
+
+      // 2. Try fetching index.html directly and extracting the baseMembers array
+      if (!loadedMembers) {
+        try {
+          const res = await fetch(`index.html?t=${cacheBuster}`, { cache: 'no-store' });
+          if (res.ok) {
+            const html = await res.text();
+            const match = html.match(/const\s+baseMembers\s*=\s*(\[[\s\S]*?\]);\s*let\s+members/);
+            if (match) {
+              const parsed = (new Function('return ' + match[1]))();
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                loadedMembers = parsed;
+                console.log(`✓ Parsed ${loadedMembers.length} members directly from index.html baseMembers`);
+              }
+            }
+          }
+        } catch (e) {}
+      }
+
+      // 3. Fallback to validate_members.js if loaded in page
+      if (!loadedMembers && typeof members !== 'undefined' && Array.isArray(members) && members.length > 0) {
+        loadedMembers = members.slice();
+        console.log(`✓ Fallback: loaded ${loadedMembers.length} members from validate_members.js`);
+      }
+
+      if (loadedMembers && loadedMembers.length > 0) {
+        currentMembersList = loadedMembers;
+        window.baseMembers = loadedMembers;
+      }
+
+      // Check URL parameters and sessionStorage for target member
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlMemberNo = urlParams.get('member');
+      const updatedMemberNo = sessionStorage.getItem('justUpdatedMemberNo');
+      const targetNo = urlMemberNo || updatedMemberNo;
+
+      populateDropdown(searchFilter.value);
+
+      if (targetNo && currentMembersList.some(m => String(m.membershipNo) === String(targetNo))) {
+        memberDropdown.value = targetNo;
+        loadMember(targetNo);
+
+        if (updatedMemberNo) {
+          sessionStorage.removeItem('justUpdatedMemberNo');
+          sessionStorage.removeItem('justUpdatedMemberName');
+          showToast(`✓ Page refreshed! Showing latest baseMembers array from index.html (Member #${targetNo})`);
+        }
+      } else if (!selectedMember && currentMembersList.length > 0) {
+        memberDropdown.selectedIndex = 1;
+        loadMember(memberDropdown.value);
+      }
+
+      updateArrayModalContent();
+    }
+
+    // Submit form (Update alumni on disk and refresh page to show latest baseMembers)
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const originalNo = origNoInput.value.trim();
+      if (!originalNo) {
+        showToast('Please select an alumni member first.', true);
+        return;
+      }
+
+      const updatedAlumni = {
+        originalMembershipNo: originalNo,
+        name: nameInput.value.trim(),
+        membershipNo: numInput.value.trim() || originalNo,
+        amLm: document.querySelector('input[name="amLm"]:checked')?.value || 'LM',
+        graduation: gradInput.value.trim(),
+        designation: desigInput.value.trim(),
+        office: officeInput.value.trim(),
+        tel: telInput.value.trim(),
+        residenceNo: residenceInput.value.trim(),
+        email: emailInput.value.trim(),
+        address: addressInput.value.trim()
+      };
+
+      btnSave.disabled = true;
+      btnSave.innerHTML = '<span>⏳</span> Saving & Refreshing...';
+
+      try {
+        const resp = await fetch('http://127.0.0.1:4567/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedAlumni)
+        });
+
+        if (resp.ok) {
+          const resData = await resp.json();
+          if (resData && resData.success) {
+            // Save state for restored selection after page refresh
+            sessionStorage.setItem('justUpdatedMemberNo', updatedAlumni.membershipNo);
+            sessionStorage.setItem('justUpdatedMemberName', updatedAlumni.name);
+
+            btnSave.disabled = true;
+            btnSave.innerHTML = '<span>🔄</span> Refreshing Page...';
+            showToast(`✓ Member #${updatedAlumni.membershipNo} permanently saved! Refreshing whole page...`);
+
+            // Unconditionally refresh the whole update UI page
+            setTimeout(() => {
+              window.location.reload();
+            }, 350);
+          } else {
+            showToast('Update failed: ' + (resData.error || 'Unknown error'), true);
+            btnSave.disabled = false;
+            btnSave.innerHTML = '<span>💾</span> Save Changes to Disk';
+          }
+        } else {
+          showToast('Could not reach auto-updater on port 4567.', true);
+          btnSave.disabled = false;
+          btnSave.innerHTML = '<span>💾</span> Save Changes to Disk';
+        }
+      } catch (err) {
+        showToast('Auto-updater is offline. Launch start_directory.command or update_alumni.command to start it.', true);
+        btnSave.disabled = false;
+        btnSave.innerHTML = '<span>💾</span> Save Changes to Disk';
+      } finally {
+        checkDaemonStatus();
+      }
+    });
+
+    // Manual Refresh button (reloads whole page)
+    const btnManualRefresh = document.getElementById('btn-manual-refresh');
+    if (btnManualRefresh) {
+      btnManualRefresh.addEventListener('click', () => {
+        if (selectedMember && selectedMember.membershipNo) {
+          sessionStorage.setItem('justUpdatedMemberNo', selectedMember.membershipNo);
+        }
+        btnManualRefresh.textContent = '⏳ Refreshing...';
+        showToast('Refreshing whole update UI page...');
+        setTimeout(() => {
+          window.location.reload();
+        }, 200);
+      });
+    }
+
+    // Modal viewers & actions
+    const btnViewArray = document.getElementById('btn-view-array');
+    const arrayModal = document.getElementById('array-modal');
+    const btnCloseModal = document.getElementById('btn-close-modal');
+    const btnCopyArray = document.getElementById('btn-copy-array');
+    const btnRefreshModalArray = document.getElementById('btn-refresh-modal-array');
+
+    if (btnViewArray && arrayModal) {
+      btnViewArray.addEventListener('click', () => {
+        updateArrayModalContent();
+        arrayModal.style.display = 'flex';
+      });
+    }
+
+    if (btnCloseModal && arrayModal) {
+      btnCloseModal.addEventListener('click', () => {
+        arrayModal.style.display = 'none';
+      });
+    }
+
+    if (arrayModal) {
+      arrayModal.addEventListener('click', (e) => {
+        if (e.target === arrayModal) arrayModal.style.display = 'none';
+      });
+    }
+
+    if (btnCopyArray) {
+      btnCopyArray.addEventListener('click', () => {
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(JSON.stringify(currentMembersList, null, 2)).then(() => {
+            btnCopyArray.textContent = '✓ Copied!';
+            setTimeout(() => { btnCopyArray.textContent = '📋 Copy JSON'; }, 2000);
+          });
+        }
+      });
+    }
+
+    if (btnRefreshModalArray) {
+      btnRefreshModalArray.addEventListener('click', async () => {
+        btnRefreshModalArray.textContent = '⏳ Loading...';
+        await loadBaseMembersFromIndex();
+        btnRefreshModalArray.textContent = '🔄 Re-read index.html';
+        showToast('✓ Re-read baseMembers array from index.html');
+      });
+    }
+
+    // Initialize
+    // Guest access restriction: Redirect guests back to index.html
+    try {
+      const auth = sessionStorage.getItem('usj_auth_user') || localStorage.getItem('usj_auth_user');
+      if (auth) {
+        const u = JSON.parse(auth);
+        if (u && u.role === 'guest') {
+          alert('Guest Access Notice:\n\nGuests do not have permission to edit alumni records. Redirecting to Directory flipbook...');
+          window.location.href = 'index.html';
+        }
+      }
+    } catch(e) {}
+
+    window.addEventListener('DOMContentLoaded', () => {
+      // Purge any legacy browser storage
+      try {
+        localStorage.removeItem('usj_added_alumni');
+        if (window.indexedDB) {
+          indexedDB.deleteDatabase('USJ_Alumni_Directory_DB');
+        }
+      } catch (e) {}
+
+      loadBaseMembersFromIndex();
+      checkDaemonStatus();
+    });
+
+    window.addEventListener('focus', () => {
+      checkDaemonStatus();
+      loadBaseMembersFromIndex();
+    });
+  </script>
+</body>
+</html>

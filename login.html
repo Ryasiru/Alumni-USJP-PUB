@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alumni Directory Login • Department of Public Administration • USJ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;900&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,900;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --usj-crimson-deep: #320306;
+      --usj-crimson-dark: #56060b;
+      --usj-crimson: #c2272d;
+      --usj-crimson-light: #d92128;
+      --usj-maroon-mid: #780d13;
+
+      --usj-yellow: #fff500;
+      --usj-gold: #ffd200;
+      --usj-gold-rich: #e5a50a;
+      --usj-gold-dark: #b8860b;
+      --usj-gold-deep: #8c6708;
+      --usj-gold-light: #fff8d6;
+
+      --paper-bg: #fffdfa;
+      --paper-tint: #faf4e8;
+      --paper-border: #ebd9b7;
+      --ink-color: #241915;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 25%, #380509 0%, #1c0104 55%, #0d0002 100%);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #fffdfa;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-y: auto;
+      padding: 30px 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .login-card-container {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: loginFadeIn 0.5s ease-out;
+    }
+
+    @keyframes loginFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    .login-logo-img {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      border: 2.5px solid var(--usj-gold);
+      box-shadow: 0 0 24px rgba(255, 210, 0, 0.65), 0 0 40px rgba(194, 39, 45, 0.4);
+      background: #fff;
+      object-fit: contain;
+      padding: 3px;
+      margin-bottom: 14px;
+      transition: transform 0.3s ease;
+    }
+
+    .login-logo-img:hover {
+      transform: scale(1.05) rotate(2deg);
+    }
+
+    .login-uni-title {
+      font-family: 'Cinzel', Georgia, serif;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #fff8d6 0%, #ffd200 60%, #b8860b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+
+    .login-dept-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #ffd200;
+      letter-spacing: 0.8px;
+      margin-bottom: 4px;
+    }
+
+    .login-sub-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-style: italic;
+      font-size: 13px;
+      color: #dfceb3;
+      letter-spacing: 0.5px;
+    }
+
+    .login-card {
+      position: relative;
+      width: 100%;
+      background: linear-gradient(165deg, rgba(54, 4, 8, 0.94) 0%, rgba(28, 2, 4, 0.98) 100%);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1.5px solid rgba(255, 210, 0, 0.45);
+      border-radius: 18px;
+      padding: 32px 30px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(194, 39, 45, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .card-ornament {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      pointer-events: none;
+    }
+
+    .ornament-tl {
+      top: 6px;
+      left: 6px;
+      border-top: 2px solid var(--usj-gold);
+      border-left: 2px solid var(--usj-gold);
+      border-top-left-radius: 6px;
+    }
+
+    .ornament-tr {
+      top: 6px;
+      right: 6px;
+      border-top: 2px solid var(--usj-gold);
+      border-right: 2px solid var(--usj-gold);
+      border-top-right-radius: 6px;
+    }
+
+    .ornament-bl {
+      bottom: 6px;
+      left: 6px;
+      border-bottom: 2px solid var(--usj-gold);
+      border-left: 2px solid var(--usj-gold);
+      border-bottom-left-radius: 6px;
+    }
+
+    .ornament-br {
+      bottom: 6px;
+      right: 6px;
+      border-bottom: 2px solid var(--usj-gold);
+      border-right: 2px solid var(--usj-gold);
+      border-bottom-right-radius: 6px;
+    }
+
+    .login-card-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 210, 0, 0.12);
+      border: 1px solid rgba(255, 210, 0, 0.35);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #ffd200;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .login-card-badge-icon {
+      width: 13px;
+      height: 13px;
+    }
+
+    .login-card-heading {
+      font-family: 'Cinzel', Georgia, serif;
+      font-size: 21px;
+      font-weight: 700;
+      color: #fffdfa;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .login-card-instructions {
+      font-size: 13px;
+      color: #c9b7aa;
+      line-height: 1.45;
+      margin-bottom: 22px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .form-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #f7e6ca;
+      margin-bottom: 6px;
+      letter-spacing: 0.3px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 13px;
+      color: rgba(255, 210, 0, 0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .login-input {
+      width: 100%;
+      height: 44px;
+      padding: 0 42px 0 40px;
+      background: rgba(255, 253, 250, 0.07);
+      border: 1.5px solid rgba(255, 210, 0, 0.28);
+      border-radius: 10px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 14px;
+      color: #fffdfa;
+      transition: all 0.25s ease;
+      outline: none;
+    }
+
+    .login-input::placeholder {
+      color: rgba(230, 215, 195, 0.45);
+      font-size: 13px;
+    }
+
+    .login-input:focus {
+      background: rgba(255, 253, 250, 0.12);
+      border-color: var(--usj-gold);
+      box-shadow: 0 0 0 3.5px rgba(255, 210, 0, 0.22);
+    }
+
+    .login-input.input-error {
+      border-color: #d92128;
+      box-shadow: 0 0 0 3.5px rgba(217, 33, 40, 0.3);
+      animation: shakeInput 0.4s ease;
+    }
+
+    @keyframes shakeInput {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    .btn-toggle-pw {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: rgba(255, 210, 0, 0.7);
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s;
+    }
+
+    .btn-toggle-pw:hover {
+      color: var(--usj-gold);
+      background: rgba(255, 210, 0, 0.1);
+    }
+
+    .form-row-remember {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .remember-checkbox-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 12.5px;
+      color: #dfceb3;
+      user-select: none;
+    }
+
+    .remember-checkbox-label input[type="checkbox"] {
+      display: none;
+    }
+
+    .custom-check {
+      width: 17px;
+      height: 17px;
+      border: 1.5px solid rgba(255, 210, 0, 0.45);
+      border-radius: 4px;
+      background: rgba(255, 253, 250, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .remember-checkbox-label input[type="checkbox"]:checked + .custom-check {
+      background: var(--usj-gold);
+      border-color: var(--usj-gold);
+    }
+
+    .remember-checkbox-label input[type="checkbox"]:checked + .custom-check::after {
+      content: '✓';
+      color: #320306;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .login-alert {
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 500;
+      line-height: 1.4;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      animation: alertSlideIn 0.3s ease;
+    }
+
+    @keyframes alertSlideIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .login-alert.error {
+      background: rgba(194, 39, 45, 0.25);
+      border: 1.5px solid rgba(217, 33, 40, 0.7);
+      color: #ffb8b8;
+    }
+
+    .login-alert.success {
+      background: rgba(20, 120, 40, 0.25);
+      border: 1.5px solid rgba(50, 180, 70, 0.7);
+      color: #a8f5b8;
+    }
+
+    .btn-login-submit {
+      width: 100%;
+      height: 48px;
+      background: linear-gradient(135deg, #ffd200 0%, #e5a50a 50%, #b8860b 100%);
+      color: #320306;
+      font-family: 'Cinzel', Georgia, serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      box-shadow: 0 6px 20px rgba(255, 210, 0, 0.35);
+      transition: all 0.25s ease;
+    }
+
+    .btn-login-submit:hover {
+      background: linear-gradient(135deg, #fff500 0%, #ffd200 50%, #e5a50a 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(255, 210, 0, 0.55);
+    }
+
+    .btn-login-submit:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 14px rgba(255, 210, 0, 0.3);
+    }
+
+    .login-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 210, 0, 0.3), transparent);
+    }
+
+    .divider-text {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #dfceb3;
+      letter-spacing: 1.2px;
+    }
+
+    .btn-guest-login {
+      width: 100%;
+      height: 45px;
+      background: rgba(255, 210, 0, 0.08);
+      border: 1.5px solid rgba(255, 210, 0, 0.55);
+      color: #ffd200;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+    }
+
+    .btn-guest-login:hover {
+      background: rgba(255, 210, 0, 0.18);
+      border-color: #ffd200;
+      box-shadow: 0 4px 18px rgba(255, 210, 0, 0.28);
+      transform: translateY(-1.5px);
+      color: #fffdfa;
+    }
+
+    .btn-guest-login:active {
+      transform: translateY(0);
+    }
+
+    /* Existing Session Banner */
+    .existing-session-card {
+      background: rgba(255, 210, 0, 0.12);
+      border: 1.5px solid var(--usj-gold);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      text-align: center;
+      animation: alertSlideIn 0.3s ease;
+    }
+
+    .existing-session-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffd200;
+      margin-bottom: 4px;
+    }
+
+    .existing-session-sub {
+      font-size: 12.5px;
+      color: #dfceb3;
+      margin-bottom: 12px;
+    }
+
+    .existing-session-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .btn-session-continue {
+      background: var(--usj-gold);
+      color: #320306;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-weight: 700;
+      font-size: 12.5px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-session-continue:hover {
+      background: #fff500;
+      transform: translateY(-1px);
+    }
+
+    .btn-session-signout {
+      background: rgba(194, 39, 45, 0.25);
+      color: #ffb8b8;
+      border: 1px solid rgba(217, 33, 40, 0.6);
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-weight: 600;
+      font-size: 12.5px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-session-signout:hover {
+      background: rgba(194, 39, 45, 0.45);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-card-container">
+    <div class="login-header">
+      <img src="logo.png" class="login-logo-img" alt="USJ Crest">
+      <h1 class="login-uni-title">UNIVERSITY OF SRI JAYEWARDENEPURA</h1>
+      <h2 class="login-dept-title">Department of Public Administration</h2>
+      <p class="login-sub-title">Official Alumni Directory & Register</p>
+    </div>
+
+    <!-- Active Session Card (shown if already logged in) -->
+    <div id="existing-session-box" class="existing-session-card" style="display: none;">
+      <div class="existing-session-title">Active Session Detected</div>
+      <div id="existing-session-desc" class="existing-session-sub">You are signed in.</div>
+      <div class="existing-session-actions">
+        <button type="button" class="btn-session-continue" onclick="redirectToDirectory()">
+          Open Alumni Flipbook &rarr;
+        </button>
+        <button type="button" class="btn-session-signout" onclick="signOutFromHere()">
+          Sign Out
+        </button>
+      </div>
+    </div>
+
+    <div class="login-card">
+      <div class="card-ornament ornament-tl"></div>
+      <div class="card-ornament ornament-tr"></div>
+      <div class="card-ornament ornament-bl"></div>
+      <div class="card-ornament ornament-br"></div>
+
+      <div class="login-card-badge">
+        <svg class="login-card-badge-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+        </svg>
+        <span>Secure Directory Access</span>
+      </div>
+
+      <h3 class="login-card-heading">Sign In to Directory</h3>
+      <p class="login-card-instructions">Enter your username and password to open the alumni flipbook, or continue as a guest.</p>
+
+      <form id="login-form" autocomplete="on">
+        <!-- Dynamic Alert Box -->
+        <div id="login-alert-box" class="login-alert" style="display: none;"></div>
+
+        <!-- Username Input -->
+        <div class="form-group">
+          <label for="login-username" class="form-label">
+            <span>Username / Member ID</span>
+          </label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+              </svg>
+            </span>
+            <input type="text" id="login-username" class="login-input" placeholder="Enter username" autocomplete="username" spellcheck="false" required>
+          </div>
+        </div>
+
+        <!-- Password Input -->
+        <div class="form-group">
+          <label for="login-password" class="form-label">
+            <span>Password</span>
+          </label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+              </svg>
+            </span>
+            <input type="password" id="login-password" class="login-input" placeholder="Enter password" autocomplete="current-password" required>
+            <button type="button" id="btn-toggle-password" class="btn-toggle-pw" title="Toggle password visibility" aria-label="Toggle password visibility">
+              <svg id="eye-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-row-remember">
+          <label class="remember-checkbox-label">
+            <input type="checkbox" id="login-remember" checked>
+            <span class="custom-check"></span>
+            <span>Remember session on this device</span>
+          </label>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="btn-login-submit" class="btn-login-submit">
+          <span>Open Alumni Flipbook</span>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-7.85-1.42 1.42L16.86 11H5v2z"/>
+          </svg>
+        </button>
+
+        <!-- Divider -->
+        <div class="login-divider">
+          <span class="divider-line"></span>
+          <span class="divider-text">OR CONTINUE AS</span>
+          <span class="divider-line"></span>
+        </div>
+
+        <!-- Guest Button -->
+        <button type="button" id="btn-guest-login" class="btn-guest-login">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+          </svg>
+          <span>Continue as Guest</span>
+        </button>
+      </form>
+
+
+    </div>
+  </div>
+
+  <script>
+    const VALID_CREDENTIALS = [
+      { username: 'pubusjp', password: 'pub2026', role: 'admin', displayName: 'Administrator' }
+    ];
+
+    function authenticateUser(username, password) {
+      const u = String(username || '').trim().toLowerCase();
+      const p = String(password || '').trim();
+      if (!u || !p) return null;
+
+      const match = VALID_CREDENTIALS.find(c => c.username.toLowerCase() === u && c.password === p);
+      if (match) return match;
+
+      return null;
+    }
+
+    function saveSession(user, remember) {
+      const data = JSON.stringify(user);
+      sessionStorage.setItem('usj_auth_user', data);
+      if (remember) {
+        localStorage.setItem('usj_auth_user', data);
+      } else {
+        localStorage.removeItem('usj_auth_user');
+      }
+    }
+
+    function getSavedSession() {
+      try {
+        const s = sessionStorage.getItem('usj_auth_user') || localStorage.getItem('usj_auth_user');
+        return s ? JSON.parse(s) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function clearSession() {
+      try {
+        sessionStorage.removeItem('usj_auth_user');
+        localStorage.removeItem('usj_auth_user');
+      } catch (e) {}
+    }
+
+    function redirectToDirectory() {
+      window.location.href = 'index.html';
+    }
+
+    function signOutFromHere() {
+      clearSession();
+      document.getElementById('existing-session-box').style.display = 'none';
+      const alertBox = document.getElementById('login-alert-box');
+      if (alertBox) {
+        alertBox.className = 'login-alert success';
+        alertBox.textContent = 'Signed out successfully.';
+        alertBox.style.display = 'flex';
+      }
+    }
+
+    function togglePasswordVisibility() {
+      const pInput = document.getElementById('login-password');
+      const eyeIcon = document.getElementById('eye-icon');
+      if (!pInput) return;
+
+      if (pInput.type === 'password') {
+        pInput.type = 'text';
+        if (eyeIcon) {
+          eyeIcon.innerHTML = '<path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>';
+        }
+      } else {
+        pInput.type = 'password';
+        if (eyeIcon) {
+          eyeIcon.innerHTML = '<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>';
+        }
+      }
+    }
+
+    function handleLogin(e) {
+      if (e) e.preventDefault();
+      const alertBox = document.getElementById('login-alert-box');
+      const uInput = document.getElementById('login-username');
+      const pInput = document.getElementById('login-password');
+      const rememberCheck = document.getElementById('login-remember');
+
+      const username = uInput ? uInput.value.trim() : '';
+      const password = pInput ? pInput.value.trim() : '';
+      const remember = rememberCheck ? rememberCheck.checked : true;
+
+      if (!username || !password) {
+        if (alertBox) {
+          alertBox.className = 'login-alert error';
+          alertBox.textContent = 'Please enter both username and password, or click Continue as Guest.';
+          alertBox.style.display = 'flex';
+        }
+        return;
+      }
+
+      const user = authenticateUser(username, password);
+      if (!user) {
+        if (alertBox) {
+          alertBox.className = 'login-alert error';
+          alertBox.textContent = 'Invalid username or password. Please try again or click Continue as Guest.';
+          alertBox.style.display = 'flex';
+        }
+        if (pInput) {
+          pInput.classList.add('input-error');
+          setTimeout(() => pInput.classList.remove('input-error'), 800);
+        }
+        return;
+      }
+
+      if (alertBox) {
+        alertBox.className = 'login-alert success';
+        alertBox.textContent = '✓ Access Granted! Redirecting to alumni flipbook...';
+        alertBox.style.display = 'flex';
+      }
+
+      saveSession(user, remember);
+      setTimeout(() => {
+        redirectToDirectory();
+      }, 400);
+    }
+
+    function handleGuest() {
+      const user = { username: 'Guest', role: 'guest', displayName: 'Guest User' };
+      saveSession(user, false);
+      const alertBox = document.getElementById('login-alert-box');
+      if (alertBox) {
+        alertBox.className = 'login-alert success';
+        alertBox.textContent = '✓ Continuing as Guest...';
+        alertBox.style.display = 'flex';
+      }
+      setTimeout(() => {
+        redirectToDirectory();
+      }, 300);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedUser = getSavedSession();
+      if (savedUser) {
+        const sessionBox = document.getElementById('existing-session-box');
+        const sessionDesc = document.getElementById('existing-session-desc');
+        if (sessionBox && sessionDesc) {
+          sessionDesc.textContent = 'You are currently signed in as ' + (savedUser.displayName || savedUser.username) + ' (' + (savedUser.role === 'admin' ? 'Administrator' : (savedUser.role === 'guest' ? 'Guest' : 'Alumni')) + ').';
+          sessionBox.style.display = 'block';
+        }
+      }
+
+      const form = document.getElementById('login-form');
+      if (form) form.addEventListener('submit', handleLogin);
+
+      const btnGuest = document.getElementById('btn-guest-login');
+      if (btnGuest) btnGuest.addEventListener('click', handleGuest);
+
+      const btnToggle = document.getElementById('btn-toggle-password');
+      if (btnToggle) btnToggle.addEventListener('click', togglePasswordVisibility);
+    });
+  </script>
+</body>
+</html>
